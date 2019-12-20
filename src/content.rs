@@ -104,10 +104,13 @@ impl ContentInterface {
             let date_num = date_string.parse::<u32>().unwrap();
             debug!("date_num:{},cmp_num:{}", date_num, cmp_num);
             if date_num >= cmp_num { continue; }
-            if let Some(rkv::Value::Json(_id)) = id {
-                // 从storage删除数据
-                debug!("del date:{}, id:{}", date_string, _id);
-                self.storage.del_single(&_id);
+            if let Some(rkv::Value::Json(ids)) = id {
+                let _ids: Vec::<String> = serde_json::from_str(ids).unwrap();
+                for _id in _ids{
+                    // 从storage删除数据
+                    debug!("del date:{}, id:{}", date_string, _id);
+                    self.storage.del_single(&_id);
+                }
             }
             // 删除自己
             index_to_delete.push(date_string);
