@@ -1,0 +1,25 @@
+[package]
+name = "server_tan"
+version = "0.1.2"
+authors = ["Chinuno Usami <usami@chinuno.com>"]
+edition = "2018"
+
+[dependencies]
+env_logger = "*"
+futures = "0.1.17"
+actix-web = "1.0"
+log = "*"
+chrono = "0.4"
+url = "*"
+serde_json = "*"
+serde = "*"
+serde_derive = "*"
+rust-crypto = "^0.2"
+rkv = "*"
+#rkv = { git = "https://github.com/mozilla/rkv" }
+config = "0.9"
+lazy_static = "*"
+clap = "~2.33"
+reqwest = "0.9.16"
+quick-xml = "0.12.0"
+uuid = { version = "0.7", features = ["v4"] }

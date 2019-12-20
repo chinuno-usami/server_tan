@@ -1,0 +1,20 @@
+appid = "APPID"
+secret = "SECRET"
+token = "TOKEN"
+host = "HOST"
+template_id = "TEMPLATE_ID"
+db_path = "db"
+# 自定义内容展示模板，会替换{::}为具体内容
+detail_template = "template.html"
+# 内容过期时间，单位天。0表示不过期
+content_expire = 1
+# 监听地址
+listen = "0.0.0.0:8800"
+# 订阅公众号的欢迎消息
+welcome = '''欢迎使用server碳消息推送系统。发送 "help" 查看帮助信息'''
+help = '''发送 "create channel 频道名" 创建频道
+发送 "show channel" 查看创建的频道
+发送 "del channel 频道id" 删除频道
+发送 "show subscribe" 查看订阅的频道
+发送 "subscribe 频道id" 订阅频道
+发送 "unsubscribe 频道id" 取消订阅频道'''
