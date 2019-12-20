@@ -1,6 +1,6 @@
 [package]
 name = "server_tan"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Chinuno Usami <usami@chinuno.com>"]
 edition = "2018"
 

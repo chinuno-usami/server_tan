@@ -15,6 +15,7 @@ extern crate serde;
 #[macro_use]
 extern crate lazy_static;
 
+#[macro_use]
 extern crate clap;
 
 mod storage;
@@ -350,7 +351,7 @@ fn wx_post(query: web::Query<AuthInfo>, message: String) -> impl Responder {
 fn main() {
     // 参数处理
     let matches = clap::App::new("Server Tan")
-        .version("0.1.2")
+        .version(crate_version!())
         .author("Chinuno Usami. <usami@chinuno.com>")
         .about("Wechat notify service")
         .args_from_usage("-c, --config=[FILE] 'Sets a custom config file'")
