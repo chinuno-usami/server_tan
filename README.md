@@ -17,6 +17,17 @@ cargo install --git https://github.com/chinuno-usami/server_tan
 3. 配置`Nginx`等web服务器
 4. 直接执行`server_tan`启动服务，默认读取当前目录下的`config.toml`作为配置文件，可通过`-c`参数指定特定的配置文件
 
-### 操作接口
+### 管理接口
 因为对前端不是很熟悉，没做web交互界面，也还没有实现二维码订阅，所有操作通过微信文字发命令交互。  
 具体操作可以在订阅服务号后发送`help`查看详情
+
+### API接口
+引用`push bear`的接口介绍：
+
+> 1个接口，2个参数
+> 简单很重要
+> 不用再看文档看到吐。1个接口，2个参数，分分钟上手。
+>
+> https://pushbear.ftqq.com/sub?sendkey={sendkey}&text={text}&desp={desp}
+> 
+> PS: 会为每一个消息通道分配独立的SendKey和二维码。
