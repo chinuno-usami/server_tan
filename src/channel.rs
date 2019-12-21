@@ -1,6 +1,6 @@
-extern crate uuid;
-extern crate serde_json;
-extern crate rkv;
+use uuid;
+use serde_json;
+use rkv;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct Channel {

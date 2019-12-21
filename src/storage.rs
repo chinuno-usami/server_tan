@@ -1,4 +1,3 @@
-extern crate rkv;
 use rkv::{
     Manager,
     Rkv,
@@ -28,7 +27,7 @@ impl SingleKvStorage {
         SingleKvStorage { env:created_arc, single: store }
     }
 
-    pub fn put_single(&self, key: &str, value: &Value) {
+    pub fn put_single(&self, key: &str, value: &Value<'_>) {
         let env = self.env.read().unwrap();
         let mut writer = env.write().unwrap();
         self.single.put(&mut writer, key, &value).unwrap();

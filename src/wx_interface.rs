@@ -1,7 +1,7 @@
-extern crate chrono;
-extern crate serde_derive;
-extern crate serde_json;
-extern crate crypto;
+use chrono;
+
+use serde_json;
+use crypto;
 
 
 #[derive(Debug, Serialize, Deserialize)]

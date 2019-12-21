@@ -1,16 +1,13 @@
-extern crate actix_web;
-extern crate url;
-
 #[macro_use]
 extern crate log;
-extern crate chrono;
-extern crate env_logger;
+use chrono;
+use env_logger;
 
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
-extern crate serde;
+
 
 #[macro_use]
 extern crate lazy_static;
@@ -349,6 +346,9 @@ fn wx_post(query: web::Query<AuthInfo>, message: String) -> impl Responder {
 
 
 fn main() {
+    // 初始化日志
+    init_log();
+
     // 参数处理
     let matches = clap::App::new("Server Tan")
         .version(crate_version!())
@@ -362,11 +362,7 @@ fn main() {
         *CONFIG_FILE.lock().unwrap() = c.to_string();
     }
 
-    // 初始化日志
-    init_log();
-
     info!("Listening on http://{}", CONFIG.listen);
-
 
     HttpServer::new(|| {
         App::new()

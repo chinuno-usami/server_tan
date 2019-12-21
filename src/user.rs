@@ -1,4 +1,4 @@
-extern crate serde_json;
+use serde_json;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct User {

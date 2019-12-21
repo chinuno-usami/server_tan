@@ -1,6 +1,6 @@
-extern crate uuid;
-extern crate serde_json;
-extern crate chrono;
+use uuid;
+use serde_json;
+use chrono;
 
 use std::sync::{
     Arc,

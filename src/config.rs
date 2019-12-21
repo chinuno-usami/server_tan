@@ -1,7 +1,6 @@
-extern crate config;
 use config::ConfigError;
 
-extern crate serde_derive;
+
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {

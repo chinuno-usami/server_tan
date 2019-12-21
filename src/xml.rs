@@ -1,5 +1,4 @@
-extern crate quick_xml;
-extern crate chrono;
+use chrono;
 
 use quick_xml::events::{ Event, BytesStart, BytesEnd, BytesText };
 use quick_xml::{ Reader, Writer };
