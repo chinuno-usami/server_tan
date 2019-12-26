@@ -1,11 +1,8 @@
-use uuid;
-use serde_json;
 use chrono;
+use serde_json;
+use uuid;
 
-use std::sync::{
-    Arc,
-    RwLock,
-};
+use std::sync::{Arc, RwLock};
 
 const STORE: &str = "content";
 const STORE_INDEX: &str = "content_index";
@@ -27,12 +24,15 @@ impl ContentInterface {
     pub fn new() -> ContentInterface {
         ContentInterface {
             storage: super::storage::SingleKvStorage::new(&super::CONFIG.db_path, STORE),
-            storage_index: super::storage::SingleKvStorage::new(&super::CONFIG.db_path, STORE_INDEX),
-            last_expire_check: Arc::new(RwLock::new(chrono::Local::today().pred()))
+            storage_index: super::storage::SingleKvStorage::new(
+                &super::CONFIG.db_path,
+                STORE_INDEX,
+            ),
+            last_expire_check: Arc::new(RwLock::new(chrono::Local::today().pred())),
         }
     }
     // 返回内容id
-    pub fn add_content(&self, body: &str) -> String  {
+    pub fn add_content(&self, body: &str) -> String {
         let id = uuid::Uuid::new_v4().to_simple().to_string();
         let today = chrono::Local::today();
         debug!("new content id:{},body:{}", id, body);
@@ -47,14 +47,14 @@ impl ContentInterface {
         }
         new_ids.push(id.clone());
         let new_json = serde_json::to_string(&new_ids).unwrap();
-        self.storage_index.put_single(&date, &rkv::Value::Json(&new_json));
-
+        self.storage_index
+            .put_single(&date, &rkv::Value::Json(&new_json));
 
         let content = self.storage.get_single(&id);
         debug!("get content:{}", id);
         match content {
             Some(content_string) => {
-                debug!("content:{}",content_string);
+                debug!("content:{}", content_string);
                 ()
             }
             None => {
@@ -66,26 +66,28 @@ impl ContentInterface {
         id
     }
 
-    pub fn get_content(&self, id: &str) -> Result<String,&str> {
+    pub fn get_content(&self, id: &str) -> Result<String, &str> {
         let content = self.storage.get_single(id);
         debug!("get content:{}", id);
         match content {
-            Some(content_string) => {
-                Ok(content_string)
-            }
-            None => Err("没找到对应内容")
+            Some(content_string) => Ok(content_string),
+            None => Err("没找到对应内容"),
         }
     }
 
     pub fn clean_contents(&self) {
         let expire = super::CONFIG.content_expire;
         debug!("expire:{}", expire);
-        if expire == 0 { return; }
+        if expire == 0 {
+            return;
+        }
         let today = chrono::Local::today();
         {
             let last_check = self.last_expire_check.read().unwrap();
             debug!("last_check:{:?},today:{:?}", *last_check, today);
-            if *last_check >= today { return; }
+            if *last_check >= today {
+                return;
+            }
         }
         {
             let mut last_check = self.last_expire_check.write().unwrap();
@@ -103,10 +105,12 @@ impl ContentInterface {
             let date_string = std::str::from_utf8(&date).unwrap();
             let date_num = date_string.parse::<u32>().unwrap();
             debug!("date_num:{},cmp_num:{}", date_num, cmp_num);
-            if date_num >= cmp_num { continue; }
+            if date_num >= cmp_num {
+                continue;
+            }
             if let Some(rkv::Value::Json(ids)) = id {
-                let _ids: Vec::<String> = serde_json::from_str(ids).unwrap();
-                for _id in _ids{
+                let _ids: Vec<String> = serde_json::from_str(ids).unwrap();
+                for _id in _ids {
                     // 从storage删除数据
                     debug!("del date:{}, id:{}", date_string, _id);
                     self.storage.del_single(&_id);

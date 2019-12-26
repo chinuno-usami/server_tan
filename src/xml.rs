@@ -1,9 +1,8 @@
 use chrono;
 
-use quick_xml::events::{ Event, BytesStart, BytesEnd, BytesText };
-use quick_xml::{ Reader, Writer };
+use quick_xml::events::{BytesEnd, BytesStart, BytesText, Event};
+use quick_xml::{Reader, Writer};
 use std::io::Cursor;
-
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct UniversMessage {
@@ -28,7 +27,6 @@ impl UniversMessage {
     }
 }
 
-
 pub fn parse_message(xml: &str) -> UniversMessage {
     let mut ret = UniversMessage::new();
     let mut reader = Reader::from_str(xml);
@@ -41,7 +39,7 @@ pub fn parse_message(xml: &str) -> UniversMessage {
             Ok(Event::Start(ref e)) => tag = reader.decode(e.name()).to_string(),
             Ok(Event::CData(data)) => {
                 let value = reader.decode(&data);
-                debug!("{}:{:?}",tag, value);
+                debug!("{}:{:?}", tag, value);
                 if tag == "MsgType" {
                     ret.msg_type = Some(value.to_string());
                 } else if tag == "Content" {
@@ -65,7 +63,7 @@ pub fn parse_message(xml: &str) -> UniversMessage {
     ret
 }
 
-pub fn gen_message_reply(to: &str, from: &str, content: &str) -> String{
+pub fn gen_message_reply(to: &str, from: &str, content: &str) -> String {
     let mut writer = Writer::new(Cursor::new(Vec::new()));
 
     let tag_xml_start = BytesStart::owned(b"xml".to_vec(), "xml".len());

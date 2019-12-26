@@ -8,34 +8,32 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 
-
 #[macro_use]
 extern crate lazy_static;
 
 #[macro_use]
 extern crate clap;
 
-mod storage;
-mod config;
 mod channel;
-mod user;
+mod config;
 mod content;
+mod storage;
+mod user;
 
 mod xml;
 
-
-mod wx_interface;
 mod access_token;
+mod wx_interface;
 
 use actix_web::{web, App, HttpResponse, HttpServer, Responder};
-use std::sync::Mutex;
-use std::io::prelude::*;
 use std::fs;
+use std::io::prelude::*;
+use std::sync::Mutex;
 
 // 全局配置对象
 lazy_static! {
     static ref CONFIG_FILE: Mutex<String> = Mutex::new("config.toml".to_string());
-    static ref CONFIG: config::Config = match config::Config::new(&CONFIG_FILE.lock().unwrap()){
+    static ref CONFIG: config::Config = match config::Config::new(&CONFIG_FILE.lock().unwrap()) {
         Ok(cfg) => cfg,
         Err(err) => panic!("{:?}", err),
     };
@@ -63,16 +61,14 @@ fn init_log() {
                 record.file().unwrap_or(""),
                 record.line().unwrap_or(0),
                 &record.args()
-                )
-
+            )
         })
         .init();
 
     info!("env_logger initialized.");
 }
 
-
-#[derive(Deserialize,Debug)]
+#[derive(Deserialize, Debug)]
 struct AuthEchoInfo {
     signature: String,
     timestamp: String,
@@ -87,7 +83,7 @@ fn wx_auth(query: web::Query<AuthEchoInfo>) -> impl Responder {
     let timestamp = &query.timestamp;
     let nonce = &query.nonce;
     let echostr = &query.echostr;
-    debug!("echostr:{}",echostr);
+    debug!("echostr:{}", echostr);
     if wx_interface::check_signature(signature, timestamp, nonce) {
         debug!("auth pass!");
         HttpResponse::Ok().body(echostr)
@@ -97,7 +93,7 @@ fn wx_auth(query: web::Query<AuthEchoInfo>) -> impl Responder {
     }
 }
 
-#[derive(Deserialize,Debug)]
+#[derive(Deserialize, Debug)]
 struct SubInfo {
     sendkey: String,
     text: String,
@@ -124,19 +120,20 @@ fn wx_sub(query: web::Query<SubInfo>) -> impl Responder {
             let at = wx.get_access_token();
             debug!("wx at:{:?}", at);
             for user in subers {
-                wx.send_template(&CONFIG.template_id,
-                                 &user.id,
-                                 &_ch.name,
-                                 &query.text,
-                                 &now,
-                                 &query.desp,
-                                 &format!("{}/content/{}", CONFIG.host, id)
-                                );
+                wx.send_template(
+                    &CONFIG.template_id,
+                    &user.id,
+                    &_ch.name,
+                    &query.text,
+                    &now,
+                    &query.desp,
+                    &format!("{}/content/{}", CONFIG.host, id),
+                );
             }
 
             HttpResponse::Ok().body("success")
         }
-        Err(err) => HttpResponse::BadRequest().body(err)
+        Err(err) => HttpResponse::BadRequest().body(err),
     }
 }
 
@@ -144,20 +141,20 @@ fn show_content(path: web::Path<String>) -> impl Responder {
     debug!("get /content/{}", path);
     // 获取content
     match content::INTERFACE.get_content(&path.to_string()) {
-       Ok(body) => {
-           debug!("get content:{}", body);
-           // 替换模板
-           let output = DETAIL_TEMPLATE.replace("{::}", &body);
-           HttpResponse::Ok().body(output)
-       }
-       Err(err) => {
-           debug!("get content:{}", err);
-           HttpResponse::NotFound().finish()
-       }
+        Ok(body) => {
+            debug!("get content:{}", body);
+            // 替换模板
+            let output = DETAIL_TEMPLATE.replace("{::}", &body);
+            HttpResponse::Ok().body(output)
+        }
+        Err(err) => {
+            debug!("get content:{}", err);
+            HttpResponse::NotFound().finish()
+        }
     }
 }
 
-#[derive(Deserialize,Debug)]
+#[derive(Deserialize, Debug)]
 struct AuthInfo {
     signature: String,
     timestamp: String,
@@ -179,15 +176,16 @@ fn show_channel(msg: xml::UniversMessage) -> String {
                         subscribers.push_str(&format!("{}({}) ", &user.name, &user.id));
                     }
                 }
-                _err => ()
+                _err => (),
             }
             channel_info.push_str(&format!(
-r#"频道名:{}
+                r#"频道名:{}
 频道ID:{}
 SendKey:{}
 订阅者:{}
 "#,
-&channel.name, &channel.id, &channel.sendkey, &subscribers));
+                &channel.name, &channel.id, &channel.sendkey, &subscribers
+            ));
             debug!("{}", &channel_info);
         }
     }
@@ -205,12 +203,13 @@ fn show_subscribe(msg: xml::UniversMessage) -> String {
             match channel::INTERFACE.get_channel_by_id(&channel) {
                 Ok(chn) => {
                     channel_infos.push_str(&format!(
-r#"频道名:{}
+                        r#"频道名:{}
 频道ID:{}
 "#,
-&chn.name, &chn.id));
+                        &chn.name, &chn.id
+                    ));
                 }
-                _err => ()
+                _err => (),
             }
             debug!("{}", &channel_infos);
         }
@@ -227,7 +226,7 @@ fn del_channel(msg: xml::UniversMessage) -> String {
         let owner = msg.from.clone().unwrap();
         match channel::INTERFACE.delete_channel(v[2], &owner) {
             Ok(_) => xml::gen_message_reply(&owner, &msg.to.unwrap(), "操作成功"),
-            Err(err) => xml::gen_message_reply(&msg.from.unwrap(), &msg.to.unwrap(), err)
+            Err(err) => xml::gen_message_reply(&msg.from.unwrap(), &msg.to.unwrap(), err),
         }
     }
 }
@@ -239,8 +238,10 @@ fn add_channel(msg: xml::UniversMessage) -> String {
     } else {
         let owner = msg.from.clone().unwrap();
         match channel::INTERFACE.add_channel(v[2], &owner) {
-            Ok(cid) => xml::gen_message_reply(&owner, &msg.to.unwrap(), &format!("操作成功,id:{}", &cid)),
-            Err(err) => xml::gen_message_reply(&msg.from.unwrap(), &msg.to.unwrap(), err)
+            Ok(cid) => {
+                xml::gen_message_reply(&owner, &msg.to.unwrap(), &format!("操作成功,id:{}", &cid))
+            }
+            Err(err) => xml::gen_message_reply(&msg.from.unwrap(), &msg.to.unwrap(), err),
         }
     }
 }
@@ -254,7 +255,7 @@ fn do_subscribe(msg: xml::UniversMessage) -> String {
         let owner = msg.from.clone().unwrap();
         match channel::INTERFACE.subscribe(v[1], &owner) {
             Ok(_) => xml::gen_message_reply(&owner, &msg.to.unwrap(), "操作成功"),
-            Err(err) => xml::gen_message_reply(&msg.from.unwrap(), &msg.to.unwrap(), err)
+            Err(err) => xml::gen_message_reply(&msg.from.unwrap(), &msg.to.unwrap(), err),
         }
     }
 }
@@ -268,7 +269,7 @@ fn do_unsubscribe(msg: xml::UniversMessage) -> String {
         let owner = msg.from.clone().unwrap();
         match channel::INTERFACE.unsubscribe(v[1], &owner) {
             Ok(_) => xml::gen_message_reply(&owner, &msg.to.unwrap(), "操作成功"),
-            Err(err) => xml::gen_message_reply(&msg.from.unwrap(), &msg.to.unwrap(), err)
+            Err(err) => xml::gen_message_reply(&msg.from.unwrap(), &msg.to.unwrap(), err),
         }
     }
 }
@@ -293,11 +294,11 @@ fn wx_post(query: web::Query<AuthInfo>, message: String) -> impl Responder {
                 "text" => {
                     let content = msg2.content.unwrap();
                     if content == "help" {
-                        HttpResponse::Ok()
-                            .body(xml::gen_message_reply(
-                                    &msg.from.unwrap(),
-                                    &msg.to.unwrap(),
-                                    &CONFIG.help))
+                        HttpResponse::Ok().body(xml::gen_message_reply(
+                            &msg.from.unwrap(),
+                            &msg.to.unwrap(),
+                            &CONFIG.help,
+                        ))
                     } else if content.as_str().starts_with("show channel") {
                         HttpResponse::Ok().body(show_channel(msg))
                     } else if content.as_str().starts_with("show subscribe") {
@@ -311,39 +312,36 @@ fn wx_post(query: web::Query<AuthInfo>, message: String) -> impl Responder {
                     } else if content.as_str().starts_with("unsubscribe") {
                         HttpResponse::Ok().body(do_unsubscribe(msg))
                     } else {
-                        HttpResponse::Ok()
-                            .body(xml::gen_message_reply(
-                                    &msg.from.unwrap(),
-                                    &msg.to.unwrap(),
-                                    &content))
+                        HttpResponse::Ok().body(xml::gen_message_reply(
+                            &msg.from.unwrap(),
+                            &msg.to.unwrap(),
+                            &content,
+                        ))
                     }
                 }
-                "event" => {
-                    match msg.event.unwrap().as_str() {
-                        "subscribe" => {
-                            let uid = msg.from.unwrap().clone();
-                            match user::INTERFACE.get_user(&uid) {
-                                Ok(_user) => (),
-                                Err(_err) => {
-                                    let _ = user::INTERFACE.add_user(&uid);
-                                }
+                "event" => match msg.event.unwrap().as_str() {
+                    "subscribe" => {
+                        let uid = msg.from.unwrap().clone();
+                        match user::INTERFACE.get_user(&uid) {
+                            Ok(_user) => (),
+                            Err(_err) => {
+                                let _ = user::INTERFACE.add_user(&uid);
                             }
-                            HttpResponse::Ok()
-                                .body(xml::gen_message_reply(
-                                        &uid,
-                                        &msg.to.unwrap(), &CONFIG.welcome))
                         }
-                        _ => HttpResponse::Ok().finish()
+                        HttpResponse::Ok().body(xml::gen_message_reply(
+                            &uid,
+                            &msg.to.unwrap(),
+                            &CONFIG.welcome,
+                        ))
                     }
-                }
-                _ => HttpResponse::Ok().finish()
+                    _ => HttpResponse::Ok().finish(),
+                },
+                _ => HttpResponse::Ok().finish(),
             }
         }
-        _ => HttpResponse::Ok().finish()
+        _ => HttpResponse::Ok().finish(),
     }
 }
-
-
 
 fn main() {
     // 初始化日志
@@ -366,10 +364,10 @@ fn main() {
 
     HttpServer::new(|| {
         App::new()
-            .route( "/wx", web::get().to(wx_auth))
-            .route( "/wx", web::post().to(wx_post))
-            .route( "/sub", web::get().to(wx_sub))
-            .route( "/content/{id}", web::get().to(show_content))
+            .route("/wx", web::get().to(wx_auth))
+            .route("/wx", web::post().to(wx_post))
+            .route("/sub", web::get().to(wx_sub))
+            .route("/content/{id}", web::get().to(show_content))
     })
     .bind(&CONFIG.listen)
     .unwrap()

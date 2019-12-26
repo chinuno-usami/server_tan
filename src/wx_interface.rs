@@ -1,8 +1,7 @@
 use chrono;
 
-use serde_json;
 use crypto;
-
+use serde_json;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct GetTokenResult {
@@ -31,7 +30,9 @@ const STORE: &str = "wx";
 
 impl WxInterface {
     pub fn new() -> WxInterface {
-        WxInterface { storage: super::storage::SingleKvStorage::new(&super::CONFIG.db_path, STORE) }
+        WxInterface {
+            storage: super::storage::SingleKvStorage::new(&super::CONFIG.db_path, STORE),
+        }
     }
 
     fn get_access_token_internal(&self) -> AccessToken {
@@ -39,23 +40,29 @@ impl WxInterface {
         let appid = config.appid;
         let secret = config.secret;
         let client = reqwest::Client::new();
-        let res: GetTokenResult = client.get("https://api.weixin.qq.com/cgi-bin/token")
+        let res: GetTokenResult = client
+            .get("https://api.weixin.qq.com/cgi-bin/token")
             .query(&[("grant_type", "client_credential")])
             .query(&[("appid", &appid)])
             .query(&[("secret", &secret)])
-            .send().unwrap()
-            .json().unwrap();
-        let expires = chrono::Utc::now()+chrono::Duration::seconds(res.expires_in);
+            .send()
+            .unwrap()
+            .json()
+            .unwrap();
+        let expires = chrono::Utc::now() + chrono::Duration::seconds(res.expires_in);
         let token = res.access_token;
-        AccessToken { access_token:token, expires:expires.timestamp()}
+        AccessToken {
+            access_token: token,
+            expires: expires.timestamp(),
+        }
     }
-
 
     fn update_access_token(&self) -> AccessToken {
         let new_token = self.get_access_token_internal();
         // kv.put_access_token(&serde_json::to_string(&new_token).unwrap());
         let json_string = serde_json::to_string(&new_token).unwrap();
-        self.storage.put_single("access_token", &rkv::Value::Json(&json_string));
+        self.storage
+            .put_single("access_token", &rkv::Value::Json(&json_string));
         new_token
     }
 
@@ -73,12 +80,20 @@ impl WxInterface {
                     access_token
                 }
             }
-            None => self.update_access_token()
+            None => self.update_access_token(),
         }
     }
 
-
-    pub fn send_template(&self, template_id: &str, user: &str, channel_name: &str, title: &str, time: &str, body: &str, url: &str) {
+    pub fn send_template(
+        &self,
+        template_id: &str,
+        user: &str,
+        channel_name: &str,
+        title: &str,
+        time: &str,
+        body: &str,
+        url: &str,
+    ) {
         let post = json!({
             "touser": user,
             "template_id": template_id,
@@ -110,7 +125,8 @@ impl WxInterface {
             .post("https://api.weixin.qq.com/cgi-bin/message/template/send")
             .query(&[("access_token", &self.get_access_token().access_token)])
             .json(&post)
-            .send().unwrap();
+            .send()
+            .unwrap();
         debug!("template res:{:?}", result);
         let tmpres: TemplateResult = result.json().unwrap();
         debug!("{:?}", tmpres);
@@ -118,12 +134,11 @@ impl WxInterface {
     }
 }
 
-
 pub fn check_signature(signature: &str, timestamp: &str, nonce: &str) -> bool {
-    debug!("signature:{}",signature);
-    debug!("timestamp:{}",timestamp);
-    debug!("nonce:{}",nonce);
-    let token:String = super::CONFIG.token.clone();
+    debug!("signature:{}", signature);
+    debug!("timestamp:{}", timestamp);
+    debug!("nonce:{}", nonce);
+    let token: String = super::CONFIG.token.clone();
     let mut v = [token, timestamp.to_string(), nonce.to_string()];
     v.sort();
 
@@ -131,7 +146,7 @@ pub fn check_signature(signature: &str, timestamp: &str, nonce: &str) -> bool {
     use self::crypto::sha1::Sha1;
 
     let mut hasher = Sha1::new();
-    hasher.input_str(format!("{}{}{}",v[0],v[1],v[2]).as_str());
+    hasher.input_str(format!("{}{}{}", v[0], v[1], v[2]).as_str());
 
     let hex = hasher.result_str();
     debug!("calced signature:{}", hex);

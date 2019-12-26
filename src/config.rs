@@ -1,7 +1,5 @@
 use config::ConfigError;
 
-
-
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
     pub appid: String,
@@ -20,7 +18,7 @@ pub struct Config {
 impl Config {
     pub fn new(path: &str) -> Result<Self, ConfigError> {
         let mut settings = config::Config::default();
-        match settings.merge(config::File::with_name(path)){
+        match settings.merge(config::File::with_name(path)) {
             Ok(_) => settings.try_into(),
             Err(err) => Err(err),
         }
