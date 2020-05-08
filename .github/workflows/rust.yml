@@ -21,11 +21,13 @@ jobs:
       if: matrix.os != 'windows-latest'
       uses: allenevans/set-env@v1.0.0
       with: 
+        overwrite: true
         NEW_RELEASE:  ${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}
     - name: Set Windows env
       if: matrix.os == 'windows-latest'
       uses: allenevans/set-env@v1.0.0
       with: 
+        overwrite: true
         NEW_RELEASE:  ${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}.exe
     - name: Build
       if: matrix.os != 'windows-latest'
@@ -34,7 +36,7 @@ jobs:
         #export RELEASE_TMP=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}
         #echo "release path: $RELEASE_TMP"
         #echo "::set-env name=NEWRELEASE_FILE::$RELEASE_TMP"
-        echo file ${env.NEWRELEASE}
+        echo file ${NEW_RELEASE}
         #echo "::set-env name=RELEASE_FILE::${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}"
         echo mv ${{env.RELEASE_PATH}}/server_tan ${NEW_RELEASE}
         mv ${{env.RELEASE_PATH}}/server_tan ${NEW_RELEASE}
