@@ -20,19 +20,13 @@ jobs:
     - name: Build
       if: matrix.os != 'windows-latest'
       run: |
-        touch a
-        export B=b
-        echo "::set-env name=BB::$B"
-        echo "BB:${{BB}}"
-        echo mv a ${{BB}}
-        echo "BB:${{env.BB}}"
-        echo mv a ${{env.BB}}
-        mv a ${{BB}}
-        mv a ${{env.BB}}
-        #cargo build --release --verbose
+        cargo build --release --verbose
         export RELEASE_TMP=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}
         echo "release path: $RELEASE_TMP"
         echo "::set-env name=RELEASE_FILE::$RELEASE_TMP"
+        echo "file:${{RELEASE_FILE}}"
+        echo "file:${{jobs.build.env.RELEASE_FILE}}"
+        echo "file:${{env.RELEASE_FILE}}"
         #echo "::set-env name=RELEASE_FILE::${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}"
         echo mv ${{env.RELEASE_PATH}}/server_tan ${{env.RELEASE_FILE}}
         mv ${{env.RELEASE_PATH}}/server_tan ${{env.RELEASE_FILE}}
@@ -40,16 +34,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: bash
       run: |
-        touch a
-        export B=b
-        echo "::set-env name=BB::$B"
-        echo "BB:${{BB}}"
-        echo mv a ${{BB}}
-        echo "BB:${{env.BB}}"
-        echo mv a ${{env.BB}}
-        mv a ${{BB}}
-        mv a ${{env.BB}}
-        #cargo build --release --verbose
+        cargo build --release --verbose
         export RELEASE_TMP=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}.exe
         echo "release path: $RELEASE_TMP"
         echo "::set-env name=RELEASE_FILE::$RELEASE_TMP"
