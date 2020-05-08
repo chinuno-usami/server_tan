@@ -21,17 +21,23 @@ jobs:
       if: matrix.os != 'windows-latest'
       run: |
         cargo build --release --verbose
-        echo "::set-env name=RELEASE_FILE::${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}"
-        echo mv ${{env.RELEASE_PATH}}/server_tan ${{env.RELEASE_FILE }}
-        mv ${{env.RELEASE_PATH}}/server_tan ${{env.RELEASE_FILE }}
+        export RELEASE_TMP=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}
+        echo "release path: $RELEASE_TMP"
+        echo "::set-env name=RELEASE_FILE::$RELEASE_TMP"
+        #echo "::set-env name=RELEASE_FILE::${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}"
+        echo mv ${{env.RELEASE_PATH}}/server_tan ${{env.RELEASE_FILE}}
+        mv ${{env.RELEASE_PATH}}/server_tan ${{env.RELEASE_FILE}}
     - name: Build-Windows
       if: matrix.os == 'windows-latest'
       shell: bash
       run: |
         cargo build --release --verbose
-        echo "::set-env name=RELEASE_FILE::${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}.exe"
-        echo mv ${{env.RELEASE_PATH}}/server_tan.exe ${{env.RELEASE_FILE }}
-        mv ${{env.RELEASE_PATH}}/server_tan.exe ${{env.RELEASE_FILE }}
+        export RELEASE_TMP=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}.exe
+        echo "release path: $RELEASE_TMP"
+        echo "::set-env name=RELEASE_FILE::$RELEASE_TMP"
+        #echo "::set-env name=RELEASE_FILE::${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}.exe"
+        echo mv ${{env.RELEASE_PATH}}/server_tan.exe ${{env.RELEASE_FILE}}
+        mv ${{env.RELEASE_PATH}}/server_tan.exe ${{env.RELEASE_FILE}}
     - name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
