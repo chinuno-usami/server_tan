@@ -28,12 +28,12 @@ jobs:
       uses: allenevans/set-env@v1.0.0
       with: 
         overwrite: true
-        NEW_RELEASE:  ${NEW_RELEASE}.exe
-        TARGET: ${TARGET}.exe 
+        NEW_RELEASE:  ${{env.NEW_RELEASE}}.exe
+        TARGET: ${{env.TARGET}}.exe 
     - name: Build
       shell: bash
       run: |
-        cargo build --release --verbose
+        #cargo build --release --verbose
         mv ${TARGET} ${NEW_RELEASE}
     - name: Release
       uses: softprops/action-gh-release@v1
