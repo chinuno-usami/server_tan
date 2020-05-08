@@ -31,7 +31,6 @@ jobs:
         NEW_RELEASE:  ${NEW_RELEASE}.exe
         TARGET: ${TARGET}.exe 
     - name: Build
-      if: matrix.os != 'windows-latest'
       shell: bash
       run: |
         cargo build --release --verbose
