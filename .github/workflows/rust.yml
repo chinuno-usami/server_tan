@@ -17,17 +17,27 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Set env
+      if: matrix.os != 'windows-latest'
+      uses: allenevans/set-env@v1.0.0
+      with: 
+        NEW_RELEASE:  ${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}
+    - name: Set Windows env
+      if: matrix.os == 'windows-latest'
+      uses: allenevans/set-env@v1.0.0
+      with: 
+        NEW_RELEASE:  ${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}.exe
     - name: Build
       if: matrix.os != 'windows-latest'
       run: |
         #cargo build --release --verbose
-        export RELEASE_TMP=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}
-        echo "release path: $RELEASE_TMP"
-        echo "::set-env name=NEWRELEASE_FILE::$RELEASE_TMP"
-        echo file ${env.NEWRELEASE_FILE}
+        #export RELEASE_TMP=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}
+        #echo "release path: $RELEASE_TMP"
+        #echo "::set-env name=NEWRELEASE_FILE::$RELEASE_TMP"
+        echo file ${env.NEWRELEASE}
         #echo "::set-env name=RELEASE_FILE::${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}"
-        echo mv ${{env.RELEASE_PATH}}/server_tan ${env.NEWRELEASE_FILE}
-        mv ${{env.RELEASE_PATH}}/server_tan ${env.RELEASE_FILE}
+        echo mv ${{env.RELEASE_PATH}}/server_tan ${NEW_RELEASE}
+        mv ${{env.RELEASE_PATH}}/server_tan ${NEW_RELEASE}
     - name: Build-Windows
       if: matrix.os == 'windows-latest'
       shell: bash
