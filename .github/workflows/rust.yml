@@ -20,13 +20,13 @@ jobs:
     - name: Build
       if: matrix.os != 'windows-latest'
       run: |
-        cargo build --release --verbose
+        #cargo build --release --verbose
         export RELEASE_TMP=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}
         echo "release path: $RELEASE_TMP"
-        echo "::set-env name=RELEASE_FILE::$RELEASE_TMP"
-        echo file ${{env.RELEASE_FILE}}
+        echo "::set-env name=NEWRELEASE_FILE::$RELEASE_TMP"
+        echo file ${{env.NEWRELEASE_FILE}}
         #echo "::set-env name=RELEASE_FILE::${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}"
-        echo mv ${{env.RELEASE_PATH}}/server_tan ${{env.RELEASE_FILE}}
+        echo mv ${{env.RELEASE_PATH}}/server_tan ${{env.NEWRELEASE_FILE}}
         mv ${{env.RELEASE_PATH}}/server_tan ${{env.RELEASE_FILE}}
     - name: Build-Windows
       if: matrix.os == 'windows-latest'
