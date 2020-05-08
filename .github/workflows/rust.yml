@@ -1,0 +1,45 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    env:
+      RELEASE_PATH: target/release
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set env
+      uses: allenevans/set-env@v1.0.0
+      with: 
+        overwrite: true
+        NEW_RELEASE:  ${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}
+        TARGET:  ${{env.RELEASE_PATH}}/server_tan
+    - name: Set Windows env
+      if: matrix.os == 'windows-latest'
+      uses: allenevans/set-env@v1.0.0
+      with: 
+        overwrite: true
+        NEW_RELEASE:  ${{env.NEW_RELEASE}}.exe
+        TARGET: ${{env.TARGET}}.exe 
+    - name: Build
+      shell: bash
+      run: |
+        cargo build --release --verbose
+        mv ${TARGET} ${NEW_RELEASE}
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          ${NEW_RELEASE}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
