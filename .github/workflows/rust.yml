@@ -33,7 +33,7 @@ jobs:
     - name: Build
       shell: bash
       run: |
-        #cargo build --release --verbose
+        cargo build --release --verbose
         mv ${TARGET} ${NEW_RELEASE}
     - name: Release
       uses: softprops/action-gh-release@v1
