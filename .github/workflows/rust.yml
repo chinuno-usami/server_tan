@@ -20,7 +20,16 @@ jobs:
     - name: Build
       if: matrix.os != 'windows-latest'
       run: |
-        cargo build --release --verbose
+        torch a
+        export B=b
+        echo "::set-env name=BB::$B"
+        echo "BB:${{BB}}"
+        echo mv a ${{BB}}
+        echo "BB:${{env.BB}}"
+        echo mv a ${{env.BB}}
+        mv a ${{BB}}
+        mv a ${{env.BB}}
+        #cargo build --release --verbose
         export RELEASE_TMP=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}
         echo "release path: $RELEASE_TMP"
         echo "::set-env name=RELEASE_FILE::$RELEASE_TMP"
@@ -31,7 +40,16 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: bash
       run: |
-        cargo build --release --verbose
+        torch a
+        export B=b
+        echo "::set-env name=BB::$B"
+        echo "BB:${{BB}}"
+        echo mv a ${{BB}}
+        echo "BB:${{env.BB}}"
+        echo mv a ${{env.BB}}
+        mv a ${{BB}}
+        mv a ${{env.BB}}
+        #cargo build --release --verbose
         export RELEASE_TMP=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}.exe
         echo "release path: $RELEASE_TMP"
         echo "::set-env name=RELEASE_FILE::$RELEASE_TMP"
