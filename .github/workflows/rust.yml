@@ -18,18 +18,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set env
-      uses: allenevans/set-env@v1.0.0
-      with: 
-        overwrite: true
-        NEW_RELEASE:  ${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}
-        TARGET:  ${{env.RELEASE_PATH}}/server_tan
+      if: matrix.os != 'windows-latest'
+      shell: bash
+      run: |
+        echo "NEW_RELEASE=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}" >> $GITHUB_ENV
+        echo "TARGET=${{env.RELEASE_PATH}}/server_tan" >> $GITHUB_ENV
     - name: Set Windows env
       if: matrix.os == 'windows-latest'
-      uses: allenevans/set-env@v1.0.0
-      with: 
-        overwrite: true
-        NEW_RELEASE:  ${{env.NEW_RELEASE}}.exe
-        TARGET: ${{env.TARGET}}.exe 
+      shell: bash
+      run: |
+        echo "NEW_RELEASE=${{env.NEW_RELEASE}}.exe" >> $GITHUB_ENV
+        echo "TARGET=${{env.TARGET}}.exe " >> $GITHUB_ENV
     - name: Build
       shell: bash
       run: |
