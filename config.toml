@@ -11,10 +11,12 @@ content_expire = 1
 # 监听地址
 listen = "0.0.0.0:8800"
 # 订阅公众号的欢迎消息
-welcome = '''欢迎使用server碳消息推送系统。发送 "help" 查看帮助信息'''
-help = '''发送 "create channel 频道名" 创建频道
-发送 "show channel" 查看创建的频道
-发送 "del channel 频道id" 删除频道
-发送 "show subscribe" 查看订阅的频道
-发送 "subscribe 频道id" 订阅频道
-发送 "unsubscribe 频道id" 取消订阅频道'''
+welcome = '''欢迎使用server碳消息推送系统。点击 <a href="weixin://bizmsgmenu?msgmenucontent=help&msgmenuid=100">help</a> 查看帮助信息'''
+help = '''
+创建频道 create channel 频道名
+查看频道 <a href="weixin://bizmsgmenu?msgmenucontent=show%20channel&msgmenuid=101">show channel</a>
+删除频道 del channel 频道id 
+订阅频道 subscribe 频道id
+取消订阅 unsubscribe 频道id 
+查看订阅的频道 <a href="weixin://bizmsgmenu?msgmenucontent=show%20subscribe&msgmenuid=102">show subscribe</a>
+'''

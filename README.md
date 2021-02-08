@@ -11,7 +11,7 @@ cargo install --git https://github.com/chinuno-usami/server_tan
 
 ## 使用
 ### 运行服务
-0. 申请微信服务号，或者自用情况下可以使用微信接口测试号，配置好推送模板
+0. 申请微信服务号，或者自用情况下可以使用微信接口测试号，配置好推送模板，公众号配置接口为 /wx 端口仅为80或443
 1. 编写详情页面展示模板，可以参考[默认模板](https://github.com/chinuno-usami/server_tan/blob/master/template.html)
 2. 编辑`config.toml`配置文件，配置文件可以参照[配置文件模板](https://github.com/chinuno-usami/server_tan/blob/master/config.toml)修改
 3. 配置`Nginx`等web服务器
