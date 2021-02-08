@@ -18,7 +18,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set env
-      if: matrix.os != 'windows-latest'
       shell: bash
       run: |
         echo "NEW_RELEASE=${{env.RELEASE_PATH}}/server_tan_${{matrix.os}}" >> $GITHUB_ENV
